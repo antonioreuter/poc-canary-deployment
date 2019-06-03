@@ -1,0 +1,61 @@
+service: poc-canary-deployment
+
+custom:
+  alerts:
+    dashboards: true
+
+plugins:
+  - serverless-plugin-canary-deployments
+  - serverless-plugin-aws-alerts 
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: eu-west-1
+  deploymentBucket:
+    name: 'serverless-deployment-${self:provider.stage}-${self:provider.region}'
+    serverSideEncryption: AES256
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - codedeploy:*
+      Resource:
+        - '*'
+
+  environment:
+    VERSION: '1.0.7'
+
+functions:
+  hello:
+    name: hello-world
+    handler: src/helloWorld.hello
+    description: 'Poc to validate the canary deployment'
+    memorySize: 128
+    reservedConcurrency: 1
+    timeout: 10
+    tags:
+      TEAM: 'Las Vegas'
+      DEPARTMENT: 'HSDP'
+      PROJECT: 'Connect IoT Gateway'
+    events:
+      - http:
+          path: hello
+          method: get
+    alarms:
+      - name: 'foo'
+        namespace: 'AWS/Lambda'
+        metric: Errors
+        threshold: 1
+        statistic: Minimum
+        period: 60
+        evaluationPeriods: 1
+        comparisonOperator: GreaterThanOrEqualToThreshold
+    deploymentSettings:
+      type: Linear10PercentEvery1Minute
+      alias: Live
+      alarms:
+        - 'HelloFooAlarm'
+
+        

@@ -1,0 +1,17 @@
+{
+  "name": "poc-canary-deployment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sdk": "^2.466.0",
+    "serverless": "^1.44.1",
+    "serverless-plugin-aws-alerts": "^1.2.4",
+    "serverless-plugin-canary-deployments": "^0.4.7"
+  }
+}
